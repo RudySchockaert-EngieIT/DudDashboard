@@ -1,6 +1,6 @@
 ﻿task . Clean, Build, Tests, ExportHelp, Stats
-task Tests ImportCompipledModule, Pester
-task CreateManifest CopyPSD, UpdatPublicFunctionsToExport
+task Tests ImportCompiledModule, Pester
+task CreateManifest CopyPSD, UpdatePublicFunctionsToExport
 task Build Compile, CreateManifest
 task Stats RemoveStats, WriteStats
 
@@ -67,7 +67,7 @@ task Compile @compileParams {
     $currentFolder = Join-Path -Path $script:ModuleRoot -ChildPath 'Template'
     if (Test-Path -Path $currentFolder) {
         Copy-Item -Path $currentFolder -Destination "$($script:OutPutFolder)\$($script:ModuleName)"  -Recurse
-       
+
     }
 }
 
@@ -82,7 +82,7 @@ task CopyPSD {
     Copy-Item @copy
 }
 
-task UpdatPublicFunctionsToExport -if (Test-Path -Path $script:PublicFolder) {
+task UpdatePublicFunctionsToExport -if (Test-Path -Path $script:PublicFolder) {
     $publicFunctions = (Get-ChildItem -Path $script:PublicFolder |
         Select-Object -ExpandProperty BaseName) -join "', '"
 
@@ -94,7 +94,7 @@ task UpdatPublicFunctionsToExport -if (Test-Path -Path $script:PublicFolder) {
 
 
 
-task ImportCompipledModule -if (Test-Path -Path $script:PsmPath) {
+task ImportCompiledModule -if (Test-Path -Path $script:PsmPath) {
     Get-Module -Name $script:ModuleName |
     Remove-Module -Force
     Import-Module -Name $script:PsdPath -Force
@@ -104,24 +104,24 @@ task Pester {
     $resultFile = "{0}\testResults{1}.xml" -f $script:OutPutFolder, (Get-date -Format 'yyyyMMdd_hhmmss')
     $testFolder = Join-Path -Path $PSScriptRoot -ChildPath 'Tests\*'
     Invoke-Pester -Path $testFolder -OutputFile $resultFile -OutputFormat NUnitxml
-}     
+}
 
 
 
 
 task RemoveStats -if (Test-Path -Path "$($script:OutPutFolder)\stats.json") {
-    Remove-Item -Force -Verbose -Path "$($script:OutPutFolder)\stats.json" 
+    Remove-Item -Force -Verbose -Path "$($script:OutPutFolder)\stats.json"
 }
 
 task WriteStats {
-    $folders = Get-ChildItem -Directory | 
+    $folders = Get-ChildItem -Directory |
     Where-Object { $PSItem.Name -ne 'Output' }
-    
+
     $stats = foreach ($folder in $folders) {
         $files = Get-ChildItem "$($folder.FullName)\*" -File
         if ($files) {
-            Get-Content -Path $files | 
-            Measure-Object -Word -Line -Character | 
+            Get-Content -Path $files |
+            Measure-Object -Word -Line -Character |
             Select-Object -Property @{N = "FolderName"; E = { $folder.Name } }, Words, Lines, Characters
         }
     }
