@@ -4,10 +4,10 @@ function  New-DUDDashboard {
     Param([Hashtable]$EndpointInit, [Hashtable]$ExtraParameters)
 
     try {
-        $GetSetting = { Param($MySetting, $ParamName) if ($MySetting -ne $null) { $DashboardParams."$ParamName" = $MySetting } }
+        $GetSetting = { Param($MySetting, $ParamName) if ($null -ne $MySetting) { $DashboardParams."$ParamName" = $MySetting } }
 
-        if ($Cache.dud -eq $null) { 
-            $Cache:dud.Data = @{ } 
+        if ($null -eq $Cache.dud) {
+            $Cache:dud.Data = @{ }
         }
         $DashboardParams = @{ }
 
@@ -16,25 +16,25 @@ function  New-DUDDashboard {
         $GetSetting.Invoke($Cache:Footer, 'Footer')
         $GetSetting.Invoke($Cache:Navigation, 'Navigation')
         $GetSetting.Invoke($Cache:dud.Settings.UDConfig.IdleTimeout, 'IdleTimeout')
-    
-        $Functions = Get-ChildItem -Path "$($Cache:dud.Paths.CurrentDashboardFolderFullPath)\Functions" -Filter '*.ps1' -Recurse 
-        $Functions | % { . $_.FullName }
-        $FunctionsNames = $Functions | % { [System.IO.Path]::GetFileNameWithoutExtension($_.FullName) }
+
+        $Functions = Get-ChildItem -Path "$($Cache:dud.Paths.CurrentDashboardFolderFullPath)\Functions" -Filter '*.ps1' -Recurse
+        $Functions | ForEach-Object { . $_.FullName }
+        $FunctionsNames = $Functions | ForEach-Object { [System.IO.Path]::GetFileNameWithoutExtension($_.FullName) }
 
         $DataSourcePath = "$($Cache:dud.Paths.CurrentDashboardFolderFullPath)\Data\$($Cache:dud.Settings.UDConfig.DataSource)"
         if (Test-Path -Path $DataSourcePath ) {
-            Get-ChildItem -Path $DataSourcePath -Filter '*.ps1' | % { . $_.FullName }
+            Get-ChildItem -Path $DataSourcePath -Filter '*.ps1' | ForEach-Object { . $_.FullName }
         }
 
         $EIParams = @{ }
         if ($PSBoundParameters.ContainsKey('EndpointInit')) {
             $EIParams = $PSBoundParameters.Item('EndpointInit')
-     
+
             if ($null -eq $EIParams.Module) { $EIParams.remove('Module') }
             if ($null -eq $EIParams.Function) { $EIParams.remove('Function') }
             if ($null -eq $EIParams.Variable) { $EIParams.remove('Variable') }
         }
-    
+
         if ($null -ne $FunctionsNames) {
             if ($null -ne $EIParams.Function) {
                 $EIParams.function = $EIParams.Function + $FunctionsNames
@@ -42,7 +42,7 @@ function  New-DUDDashboard {
             else {
                 $EIParams.Function = $FunctionsNames
             }
-        
+
         }
 
         $EI = New-UDEndpointInitialization  @EIParams
@@ -51,22 +51,24 @@ function  New-DUDDashboard {
 
         $DataSourcePath = "$($Cache:dud.Paths.CurrentDashboardFolderFullPath)\Data\$($Cache:dud.Settings.UDConfig.DataSource)"
         if (Test-Path -Path $DataSourcePath ) {
-            Get-ChildItem -Path $DataSourcePath -Filter '*.ps1' | % { . $_.FullName }
+            Get-ChildItem -Path $DataSourcePath -Filter '*.ps1' | ForEach-Object { . $_.FullName }
         }
-        
-        if ($null -eq $Params) { $Params = @{ } 
+
+        if ($null -eq $Params) {
+            $Params = @{ }
         }
-        if ($null -eq $ExtraParameters) { $ExtraParameters = @{ }
+        if ($null -eq $ExtraParameters) {
+            $ExtraParameters = @{ }
         }
-        
-        if ($Cache:dud.Settings.Authentication -ne $null -and ($Cache:LoginPage -eq $null -or $Cache:LoginPage.Gettype().name -ne 'LoginPage')) {
+
+        if ($null -ne $Cache:dud.Settings.Authentication -and ($null -eq $Cache:LoginPage -or $Cache:LoginPage.Gettype().name -ne 'LoginPage')) {
             throw 'Login page not found'
         }
-                
+
         $Dash = New-UDDashboard @DashboardParams @Params @ExtraParameters -EndpointInitialization $EI
         $Dash.Design = $Cache:dud.Settings.UDConfig.Design
         return  $Dash
-    
+
     }
     catch {
         if ($Cache:dud.Settings.UDConfig.Design -eq $true) {
@@ -76,13 +78,13 @@ function  New-DUDDashboard {
                 New-UDCard -Title 'DashboardParams' -Text ($DashboardParams | Out-String)
                 New-UDCard -Title 'Params' -Text ($Params | Out-String)
                 New-UDCard -Title 'ExtraParameters' -Text ($ExtraParameters | Out-String)
-            
-            }    
+
+            }
         }
-      
+
     }
-    
-  
+
+
 } #111111
 
 

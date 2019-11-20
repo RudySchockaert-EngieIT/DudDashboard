@@ -6,17 +6,17 @@
 # }
 
 #$UDLoginPageParams.AuthorizationPolicy = $AuthorizationPolicy
- 
+
 #Auth params from Appsettings.json
-$AuthParams = @{ }; $Cache:dud.Settings.Authentication.psobject.Properties | % { $AuthParams."$($_.Name)" = $_.Value }
-$Auth = New-UDAuthenticationMethod @AuthParams 
+$AuthParams = @{ }; $Cache:dud.Settings.Authentication.psobject.Properties | ForEach-Object { $AuthParams."$($_.Name)" = $_.Value }
+$Auth = New-UDAuthenticationMethod @AuthParams
 $UDLoginPageParams.AuthenticationMethod.Add($Auth)
 
 
-if ($Cache:dud.Settings.udConfig.APISigninKey -ne $null) {
-    $ApiAuthMethod = New-UDAuthenticationMethod -SigningKey $Cache:dud.Settings.udConfig.APISigninKey 
+if ($null -ne $Cache:dud.Settings.udConfig.APISigninKey) {
+    $ApiAuthMethod = New-UDAuthenticationMethod -SigningKey $Cache:dud.Settings.udConfig.APISigninKey
     $AuthenticationMethods.AuthenticationMethod.Add($ApiAuthMethod)
-    
+
 }
 
 New-UDLoginPage @UDLoginPageParams

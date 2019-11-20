@@ -5,11 +5,11 @@
         [Switch]$Wait,
         $Parameters
     )
-    
-    
+
+
     Set-DUDSettingsCache
 
-    
+
 
 
     $LoginFilePath = "$($Cache:dud.Paths.Root)\src\Login.ps1"
@@ -37,17 +37,17 @@
     if ([String]::IsNullOrWhiteSpace($Cache:dud.Settings.UDConfig.SSLCertificatePath) -eq $false) {
         $DashboardStartParams.Certificate = Get-ChildItem -Path $Cache:dud.Settings.UDConfig.SSLCertificatePath
     }
-    $GetSetting = { Param($MySetting, $ParamName) if ($MySetting -ne $null) { $DashboardStartParams."$ParamName" = $MySetting } }
+    $GetSetting = { Param($MySetting, $ParamName) if ($null -ne $MySetting) { $DashboardStartParams."$ParamName" = $MySetting } }
     $GetSetting.Invoke($Cache:dud.Settings.UDConfig.UpdateToken, 'UpdateToken')
     $GetSetting.Invoke($Cache:dud.Paths.CurrentDashboardFullPath, 'FilePath')
     $GetSetting.Invoke($Cache:dud.Settings.UDConfig.Design, 'Design')
     $DashboardStartParams.Endpoint = $Endpoints
 
-    if ($null -eq $Parameters) { 
+    if ($null -eq $Parameters) {
         $Parameters = @{ }
     }
 
-    if ($cache:dud.Settings.PublishedFolders -ne $null) {
+    if ($null -ne $cache:dud.Settings.PublishedFolders) {
         $PublishedFolders = [system.collections.generic.list[psobject]]::new()
         Foreach ($i in ($cache:dud.Settings.PublishedFolders | Get-Member -MemberType NoteProperty).Name) {
             $PublishedFolders.Add((Publish-UDFolder -Path $cache:dud.Settings.PublishedFolders."$i" -RequestPath $i))
@@ -57,7 +57,7 @@
         }
     }
 
-    Start-UDDashboard @Parameters @PSBoundParameters @DashboardStartParams 
-    
+    Start-UDDashboard @Parameters @PSBoundParameters @DashboardStartParams
+
 }
 
