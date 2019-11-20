@@ -9,8 +9,8 @@ if ([String]::IsNullOrWhiteSpace($Path) -eq $false) {
     Set-Location -Path $Path 
 }
 
-#Import-Module DUDDashboard
-import-module 'C:\Github\DudDashboard\DudDashboard.psd1' 
+Import-Module DUDDashboard
+#import-module 'C:\Github\DudDashboard\DudDashboard.psd1' 
 $root = $PSScriptRoot
 Set-DUDSettingsCache -Path $root
 
