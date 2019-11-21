@@ -6,7 +6,7 @@
         $Cache:dud.Paths.Root = (Get-location).Path
 
     }
-    $SettingsPath = if ($null -ne $path) { $Path }else { $Cache:dud.Paths.Root }
+    $SettingsPath = if ($null -ne $path) { $Path } else { $Cache:dud.Paths.Root }
     try {
         $Cache:dud.Settings = Get-Content "$SettingsPath\appsettings.json" -ErrorAction stop | ConvertFrom-Json -ErrorAction Stop
     }
@@ -15,8 +15,6 @@
         $Cache:dud = $null
         throw $CurrentError
     }
-
-
 
     $Cache:dud.Paths = @{
         Root                           = $Cache:dud.Paths.Root
@@ -27,8 +25,6 @@
 
     $Cache:dud.Paths.CurrentDashboardFolderFullPath = "$($Cache:dud.Paths.Root)\src"
     $Cache:dud.Paths.CurrentDashboardFullPath = "$($Cache:dud.Paths.Root)\src\Root.ps1"
-
-
 }
 
 

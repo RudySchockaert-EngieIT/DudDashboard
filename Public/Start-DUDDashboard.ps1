@@ -6,11 +6,7 @@
         $Parameters
     )
 
-
     Set-DUDSettingsCache
-
-
-
 
     $LoginFilePath = "$($Cache:dud.Paths.Root)\src\Login.ps1"
     if (Test-Path -Path $LoginFilePath) {
@@ -31,7 +27,6 @@
 
     $Params = Get-DUDFolders
     $Cache:dud.Params = $Params
-
 
     $DashboardStartParams = @{ }
     if ([String]::IsNullOrWhiteSpace($Cache:dud.Settings.UDConfig.SSLCertificatePath) -eq $false) {
