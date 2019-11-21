@@ -21,11 +21,6 @@ function  New-DUDDashboard {
         $Functions | ForEach-Object { . $_.FullName }
         $FunctionsNames = $Functions | ForEach-Object { [System.IO.Path]::GetFileNameWithoutExtension($_.FullName) }
 
-        $DataSourcePath = "$($Cache:dud.Paths.CurrentDashboardFolderFullPath)\Data\$($Cache:dud.Settings.UDConfig.DataSource)"
-        if (Test-Path -Path $DataSourcePath ) {
-            Get-ChildItem -Path $DataSourcePath -Filter '*.ps1' | ForEach-Object { . $_.FullName }
-        }
-
         $EIParams = @{ }
         if ($PSBoundParameters.ContainsKey('EndpointInit')) {
             $EIParams = $PSBoundParameters.Item('EndpointInit')
@@ -48,11 +43,6 @@ function  New-DUDDashboard {
         $EI = New-UDEndpointInitialization  @EIParams
         $Params = Get-DUDFolders
         $Cache:dud.Params = $Params
-
-        $DataSourcePath = "$($Cache:dud.Paths.CurrentDashboardFolderFullPath)\Data\$($Cache:dud.Settings.UDConfig.DataSource)"
-        if (Test-Path -Path $DataSourcePath ) {
-            Get-ChildItem -Path $DataSourcePath -Filter '*.ps1' | ForEach-Object { . $_.FullName }
-        }
 
         if ($null -eq $Params) {
             $Params = @{ }

@@ -10,8 +10,12 @@
 
     $Functions = Get-ChildItem -Path "$($Cache:dud.Paths.CurrentDashboardFolderFullPath)\Functions" -Filter '*.ps1' -Recurse
     $Functions | ForEach-Object { . $_.FullName }
-    $FunctionsNames = $Functions | ForEach-Object { [System.IO.Path]::GetFileNameWithoutExtension($_.FullName) }
+    #$FunctionsNames = $Functions | ForEach-Object { [System.IO.Path]::GetFileNameWithoutExtension($_.FullName) }
 
+    $DataSourcePath = "$($Cache:dud.Paths.CurrentDashboardFolderFullPath)\Data\$($Cache:dud.Settings.UDConfig.DataSource)"
+    if (Test-Path -Path $DataSourcePath ) {
+        Get-ChildItem -Path $DataSourcePath -Filter '*.ps1' | ForEach-Object { . $_.FullName }
+    }
 
     Get-ChildItem "$($Cache:dud.Paths.CurrentDashboardFolderFullPath)\Pages\*.ps1" -Recurse | Sort-Object FullName | ForEach-Object { $Output.Pages += (& $_.FullName) }
 
@@ -20,7 +24,6 @@
 
     $ScriptsPath = Get-ChildItem "$($Cache:dud.Paths.CurrentDashboardFolderFullPath)\Scripts\*.*" | Sort-Object FullName
     $ScriptsPath.Name | ForEach-Object { $Output.Scripts += "/scripts/$_" }
-
 
     $StylesPath = "$($Cache:dud.Paths.CurrentDashboardFolderFullPath)\Styles"
     $StylesPath | Copy-Item -Destination "$($Cache:dud.Paths.Root)\client"  -Container -Recurse -Force
